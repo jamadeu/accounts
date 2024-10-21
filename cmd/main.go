@@ -4,12 +4,17 @@ import (
 	"os"
 
 	"github.com/jamadeu/accounts/cmd/api"
-	"gorm.io/gorm"
+	"github.com/jamadeu/accounts/config"
 )
 
 func main() {
 
-	server := api.NewApiServer(os.Getenv("PORT"), &gorm.DB{})
+	db, err := config.ConnectDb()
+	if err != nil {
+		panic(err)
+	}
+
+	server := api.NewApiServer(os.Getenv("PORT"), db)
 	if err := server.Run(); err != nil {
 		panic(err)
 	}
