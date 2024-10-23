@@ -22,3 +22,7 @@ type Transaction struct {
 	Type      string
 	AccountID uint
 }
+
+type AccountRepository interface {
+	CreateAccount(account Account) error
+}
