@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/jamadeu/api-cars/schemas"
+	"github.com/jamadeu/accounts/types"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
@@ -22,7 +22,7 @@ func ConnectDb() (*gorm.DB, error) {
 	}
 
 	// Migrate the schema
-	if err = db.AutoMigrate(&schemas.Car{}); err != nil {
+	if err = db.AutoMigrate(&types.User{}, &types.Transaction{}, &types.Account{}); err != nil {
 		// fmt.Errorf("Automigratoin error: %v", err)
 		return nil, err
 	}
