@@ -1,8 +1,6 @@
 package main
 
 import (
-	"os"
-
 	"github.com/jamadeu/accounts/cmd/api"
 	"github.com/jamadeu/accounts/config"
 )
@@ -14,7 +12,7 @@ func main() {
 		panic(err)
 	}
 
-	server := api.NewApiServer(os.Getenv("PORT"), db)
+	server := api.NewApiServer(":8080", db)
 	if err := server.Run(); err != nil {
 		panic(err)
 	}
