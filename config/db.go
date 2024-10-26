@@ -1,7 +1,7 @@
 package config
 
 import (
-	"github.com/jamadeu/accounts/types"
+	"github.com/jamadeu/accounts/schemas"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
@@ -20,11 +20,11 @@ func ConnectDb() (*gorm.DB, error) {
 	}
 
 	// Migrate the schema
-	if err = db.AutoMigrate(&types.User{}, &types.Transaction{}); err != nil {
+	if err = db.AutoMigrate(&schemas.User{}, &schemas.Transaction{}); err != nil {
 		// fmt.Errorf("Automigratoin error: %v", err)
 		return nil, err
 	}
-	if err = db.AutoMigrate(&types.Account{}); err != nil {
+	if err = db.AutoMigrate(&schemas.Account{}); err != nil {
 		// fmt.Errorf("Automigratoin error: %v", err)
 		return nil, err
 	}

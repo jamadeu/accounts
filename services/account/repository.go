@@ -1,7 +1,7 @@
 package account
 
 import (
-	"github.com/jamadeu/accounts/types"
+	"github.com/jamadeu/accounts/schemas"
 
 	"gorm.io/gorm"
 )
@@ -14,6 +14,6 @@ func NewAccountRepository(db *gorm.DB) *AccountRepository {
 	return &AccountRepository{db: db}
 }
 
-func (ar *AccountRepository) CreateAccount(account types.Account) error {
-	return ar.db.Create(&account).Error
+func (r *AccountRepository) CreateAccount(account schemas.Account) error {
+	return r.db.Create(&account).Error
 }

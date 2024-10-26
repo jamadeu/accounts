@@ -3,11 +3,12 @@ package api
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/jamadeu/accounts/services/account"
+	"github.com/jamadeu/accounts/services/user"
 	"gorm.io/gorm"
 )
 
 const (
-	basePath = "api/v1"
+	basePath = "api"
 )
 
 type APIServer struct {
@@ -26,7 +27,8 @@ func (s *APIServer) Run() error {
 	router := gin.Default()
 
 	accountRepo := account.NewAccountRepository(s.db)
-	accountHandler := account.NewAccountHandler(accountRepo)
+	userRepo := user.NewUserRepository(s.db)
+	accountHandler := account.NewAccountHandler(accountRepo, userRepo)
 	accountHandler.RegisterRoutes(router, basePath)
 
 	return router.Run(s.port)
