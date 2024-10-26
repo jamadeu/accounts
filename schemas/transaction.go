@@ -8,8 +8,8 @@ import (
 
 type Transaction struct {
 	gorm.Model
-	Type      string
-	AccountID uint
+	Type      string `gorm:"not null"`
+	AccountID uint   `gorm:"not null"`
 }
 
 type TransactionResponse struct {

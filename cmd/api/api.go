@@ -26,8 +26,11 @@ func NewApiServer(addr string, db *gorm.DB) *APIServer {
 func (s *APIServer) Run() error {
 	router := gin.Default()
 
-	accountRepo := account.NewAccountRepository(s.db)
 	userRepo := user.NewUserRepository(s.db)
+	userHandler := user.NewUserHandler(userRepo)
+	userHandler.RegisterRoutes(router, basePath)
+
+	accountRepo := account.NewAccountRepository(s.db)
 	accountHandler := account.NewAccountHandler(accountRepo, userRepo)
 	accountHandler.RegisterRoutes(router, basePath)
 

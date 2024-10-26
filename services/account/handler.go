@@ -5,6 +5,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/jamadeu/accounts/schemas"
+	"github.com/jamadeu/accounts/services"
 )
 
 type AccountHandler struct {
@@ -28,12 +29,12 @@ func (ah *AccountHandler) handleCreateAccount(ctx *gin.Context) {
 	ctx.BindJSON(&request)
 	if err := request.Validate(); err != nil {
 		// fmt.Errorf("validation error: %v", err.Error())
-		sendError(ctx, http.StatusBadRequest, err.Error())
+		services.SendError(ctx, http.StatusBadRequest, err.Error())
 		return
 	}
 	user, err := ah.userRepository.FindById(request.UserId)
 	if err != nil {
-		sendError(ctx, http.StatusBadRequest, "user not found")
+		services.SendError(ctx, http.StatusBadRequest, "user not found")
 		return
 	}
 	account := schemas.Account{
@@ -42,8 +43,8 @@ func (ah *AccountHandler) handleCreateAccount(ctx *gin.Context) {
 		Transactions: []schemas.Transaction{},
 	}
 	if err := ah.accountRepo.CreateAccount(account); err != nil {
-		sendError(ctx, http.StatusInternalServerError, "creating account on database")
+		services.SendError(ctx, http.StatusInternalServerError, "creating account on database")
 		return
 	}
-	sendSuccess(ctx, "create-account", account)
+	services.SendSuccess(ctx, "create-account", account)
 }

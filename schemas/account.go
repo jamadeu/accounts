@@ -8,9 +8,9 @@ import (
 
 type Account struct {
 	gorm.Model
-	Balance      float64
-	User         User
-	Transactions []Transaction
+	Balance      float64       `gorm:"not null"`
+	User         User          `gorm:"not null"`
+	Transactions []Transaction `gorm:"not null"`
 }
 
 type AccountRepository interface {

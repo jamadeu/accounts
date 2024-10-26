@@ -21,3 +21,10 @@ func (r *UserRepository) FindById(id uint) (*schemas.User, error) {
 	}
 	return &user, nil
 }
+
+func (r *UserRepository) Create(user *schemas.User) (schemas.User, error) {
+	if err := r.db.Create(&user).Error; err != nil {
+		return schemas.User{}, err
+	}
+	return *user, nil
+}

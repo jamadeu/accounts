@@ -8,14 +8,15 @@ import (
 
 type User struct {
 	gorm.Model
-	Name      string
-	Document  string
-	Email     string
+	Name      string `gorm:"not null"`
+	Document  string `gorm:"not null,unique"`
+	Email     string `gorm:"not null,unique"`
 	AccountID uint
 }
 
 type UserRepository interface {
 	FindById(id uint) (*User, error)
+	Create(user *User) (User, error)
 }
 
 type UserResponse struct {
