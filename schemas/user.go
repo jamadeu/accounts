@@ -16,6 +16,7 @@ type User struct {
 
 type UserRepository interface {
 	FindById(id string) (*User, error)
+	ListUsers() (*[]User, error)
 	Create(user *User) (User, error)
 }
 

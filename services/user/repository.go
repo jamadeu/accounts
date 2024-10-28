@@ -28,3 +28,11 @@ func (r *UserRepository) Create(user *schemas.User) (schemas.User, error) {
 	}
 	return *user, nil
 }
+
+func (r *UserRepository) ListUsers() (*[]schemas.User, error) {
+	users := []schemas.User{}
+	if err := r.db.Find(&users).Error; err != nil {
+		return nil, err
+	}
+	return &users, nil
+}

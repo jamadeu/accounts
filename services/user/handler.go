@@ -22,6 +22,7 @@ func (h *UserHandler) RegisterRoutes(router *gin.Engine, basePath string) {
 	{
 		v1.POST("/user", h.handleCreateUser)
 		v1.GET("/user", h.handleFindUserById)
+		v1.GET("/users", h.handleListUsers)
 	}
 }
 
@@ -61,4 +62,13 @@ func (h *UserHandler) handleFindUserById(ctx *gin.Context) {
 		return
 	}
 	services.SendSuccess(ctx, "find-user-by-id", user)
+}
+
+func (h *UserHandler) handleListUsers(ctx *gin.Context) {
+	users, err := h.userRepo.ListUsers()
+	if err != nil {
+		services.SendError(ctx, http.StatusInternalServerError, "error to list users")
+	}
+	services.SendSuccess(ctx, "list-users", users)
+
 }
