@@ -1,6 +1,7 @@
 package user
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -17,9 +18,10 @@ func NewUserHandler(ur schemas.UserRepository) *UserHandler {
 }
 
 func (h *UserHandler) RegisterRoutes(router *gin.Engine, basePath string) {
-	v1 := router.Group(basePath)
+	v1 := router.Group(basePath + "/v1")
 	{
-		v1.POST("/v1/user", h.handleCreateUser)
+		v1.POST("/user", h.handleCreateUser)
+		v1.GET("/user", h.handleFindUserById)
 	}
 }
 
@@ -28,7 +30,7 @@ func (h *UserHandler) handleCreateUser(ctx *gin.Context) {
 	request := CreateUserRequest{}
 	ctx.BindJSON(&request)
 	if err = request.Validate(); err != nil {
-		// fmt.Errorf("validation error: %v", err.Error())
+		fmt.Printf("validation error: %v", err.Error())
 		services.SendError(ctx, http.StatusBadRequest, err.Error())
 		return
 	}
@@ -45,4 +47,18 @@ func (h *UserHandler) handleCreateUser(ctx *gin.Context) {
 		return
 	}
 	services.SendSuccess(ctx, "create-user", user)
+}
+
+func (h *UserHandler) handleFindUserById(ctx *gin.Context) {
+	id := ctx.Query("id")
+	if id == "" {
+		services.SendError(ctx, http.StatusBadRequest, errParamIsRequired("id", "queryParameter").Error())
+		return
+	}
+	user, err := h.userRepo.FindById(id)
+	if err != nil {
+		services.SendError(ctx, http.StatusNotFound, fmt.Sprintf("user with id: %s not found", id))
+		return
+	}
+	services.SendSuccess(ctx, "find-user-by-id", user)
 }

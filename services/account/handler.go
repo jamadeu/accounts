@@ -28,7 +28,6 @@ func (ah *AccountHandler) handleCreateAccount(ctx *gin.Context) {
 	request := CreateAccountRequest{}
 	ctx.BindJSON(&request)
 	if err := request.Validate(); err != nil {
-		// fmt.Errorf("validation error: %v", err.Error())
 		services.SendError(ctx, http.StatusBadRequest, err.Error())
 		return
 	}

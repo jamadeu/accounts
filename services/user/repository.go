@@ -14,7 +14,7 @@ func NewUserRepository(db *gorm.DB) *UserRepository {
 	return &UserRepository{db: db}
 }
 
-func (r *UserRepository) FindById(id uint) (*schemas.User, error) {
+func (r *UserRepository) FindById(id string) (*schemas.User, error) {
 	user := schemas.User{}
 	if err := r.db.First(&user, id).Error; err != nil {
 		return nil, err

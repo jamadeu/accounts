@@ -15,7 +15,7 @@ type User struct {
 }
 
 type UserRepository interface {
-	FindById(id uint) (*User, error)
+	FindById(id string) (*User, error)
 	Create(user *User) (User, error)
 }
 
