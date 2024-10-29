@@ -36,3 +36,10 @@ func (r *UserRepository) ListUsers() (*[]schemas.User, error) {
 	}
 	return &users, nil
 }
+
+func (r *UserRepository) Update(user *schemas.User) error {
+	if err := r.db.Save(&user).Error; err != nil {
+		return err
+	}
+	return nil
+}

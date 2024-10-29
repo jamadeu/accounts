@@ -7,14 +7,14 @@ import (
 	"github.com/jamadeu/accounts/util"
 )
 
+func errParamIsRequired(name, typ string) error {
+	return fmt.Errorf("param: %s (type: %s) is required", name, typ)
+}
+
 type CreateUserRequest struct {
 	Name     string `json:"name"`
 	Document string `json:"document"`
 	Email    string `json:"email"`
-}
-
-func errParamIsRequired(name, typ string) error {
-	return fmt.Errorf("param: %s (type: %s) is required", name, typ)
 }
 
 func (r *CreateUserRequest) Validate() error {
@@ -41,5 +41,23 @@ func validEmailFormat(email string) bool {
 func validCpf(cpf string) bool {
 	bool, _ := util.Valid(cpf)
 	return !bool
+}
 
+type UpdateUserRequest struct {
+	Name     string `json:"name"`
+	Document string `json:"document"`
+	Email    string `json:"email"`
+}
+
+func (r *UpdateUserRequest) Validate() error {
+	if r.Name != "" || r.Document != "" || r.Email != "" {
+		return nil
+	}
+	if r.Email != "" && validEmailFormat(r.Email) {
+		return errParamIsRequired("email", "string")
+	}
+	if r.Document != "" && validCpf(r.Document) {
+		return errParamIsRequired("document", "string")
+	}
+	return fmt.Errorf("at least one valid field must be provided")
 }
