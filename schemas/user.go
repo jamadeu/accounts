@@ -19,6 +19,7 @@ type UserRepository interface {
 	ListUsers() (*[]User, error)
 	Create(user *User) (User, error)
 	Update(user *User) error
+	Delete(user *User) error
 }
 
 type UserResponse struct {

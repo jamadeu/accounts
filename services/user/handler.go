@@ -24,6 +24,7 @@ func (h *UserHandler) RegisterRoutes(router *gin.Engine, basePath string) {
 		v1.GET("/user", h.handleFindUserById)
 		v1.GET("/users", h.handleListUsers)
 		v1.PUT("/user", h.handleUpdateUser)
+		v1.DELETE("/user", h.handleDeleteUser)
 	}
 }
 
@@ -105,4 +106,23 @@ func (h *UserHandler) handleUpdateUser(ctx *gin.Context) {
 		return
 	}
 	s.SendSuccess(ctx, "update-user", user)
+}
+
+func (h *UserHandler) handleDeleteUser(ctx *gin.Context) {
+	id := ctx.Query("id")
+	if id == "" {
+		s.SendError(ctx, http.StatusBadRequest, errParamIsRequired("id", "queryParameter").Error())
+		return
+	}
+	user, err := h.userRepo.FindById(id)
+	if err != nil {
+		s.SendError(ctx, http.StatusNotFound, fmt.Sprintf("user with id: %s not found", id))
+		return
+	}
+	err = h.userRepo.Delete(user)
+	if err != nil {
+		s.SendError(ctx, http.StatusInternalServerError, fmt.Sprintf("error deleteing car with id: %s", id))
+		return
+	}
+	s.SendSuccess(ctx, "delete-user", fmt.Sprintf("id: %s", id))
 }

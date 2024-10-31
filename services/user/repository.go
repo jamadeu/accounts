@@ -43,3 +43,10 @@ func (r *UserRepository) Update(user *schemas.User) error {
 	}
 	return nil
 }
+
+func (r *UserRepository) Delete(user *schemas.User) error {
+	if err := r.db.Delete(&user, user.ID).Error; err != nil {
+		return err
+	}
+	return nil
+}
