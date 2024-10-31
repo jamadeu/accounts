@@ -24,7 +24,7 @@ func (r *CreateUserRequest) Validate() error {
 	if r.Name == "" {
 		return errParamIsRequired("name", "string")
 	}
-	if r.Document == "" || validCpf(r.Document) {
+	if r.Document == "" {
 		return errParamIsRequired("document", "string")
 	}
 	if r.Email == "" || validEmailFormat(r.Email) {

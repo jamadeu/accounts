@@ -79,6 +79,7 @@ func (h *UserHandler) handleUpdateUser(ctx *gin.Context) {
 	ctx.BindJSON(&request)
 	if err := request.Validate(); err != nil {
 		s.SendError(ctx, http.StatusBadRequest, err.Error())
+		return
 	}
 	id := ctx.Query("id")
 	if id == "" {
