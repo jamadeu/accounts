@@ -35,7 +35,7 @@ func (r *CreateUserRequest) Validate() error {
 
 func validEmailFormat(email string) bool {
 	_, err := mail.ParseAddress(email)
-	return err == nil
+	return err != nil
 }
 
 func validCpf(cpf string) bool {
