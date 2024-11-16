@@ -3,8 +3,6 @@ package user
 import (
 	"fmt"
 	"net/mail"
-
-	"github.com/jamadeu/accounts/util"
 )
 
 func errParamIsRequired(name, typ string) error {
@@ -38,11 +36,6 @@ func validEmailFormat(email string) bool {
 	return err != nil
 }
 
-func validCpf(cpf string) bool {
-	bool, _ := util.Valid(cpf)
-	return !bool
-}
-
 type UpdateUserRequest struct {
 	Name     string `json:"name"`
 	Document string `json:"document"`
@@ -50,14 +43,11 @@ type UpdateUserRequest struct {
 }
 
 func (r *UpdateUserRequest) Validate() error {
-	if r.Name != "" || r.Document != "" || r.Email != "" {
-		return nil
-	}
 	if r.Email != "" && validEmailFormat(r.Email) {
 		return errParamIsRequired("email", "string")
 	}
-	if r.Document != "" && validCpf(r.Document) {
-		return errParamIsRequired("document", "string")
+	if r.Name != "" || r.Document != "" || r.Email != "" {
+		return nil
 	}
 	return fmt.Errorf("at least one valid field must be provided")
 }
