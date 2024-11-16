@@ -45,7 +45,7 @@ func TestUserHandlers(t *testing.T) {
 	router := gin.Default()
 	handler.RegisterRoutes(router, "/api")
 
-	t.Run("should handle get user by ID", func(t *testing.T) {
+	t.Run("handle find should get user by ID", func(t *testing.T) {
 		w := httptest.NewRecorder()
 		userId := strconv.Itoa(int(userTest.ID))
 		req, err := http.NewRequest("GET", "/api/v1/user?id="+userId, nil)
@@ -60,11 +60,10 @@ func TestUserHandlers(t *testing.T) {
 			"}"
 
 		assert.Equal(t, http.StatusOK, w.Code)
-		assert.NotEmpty(t, w.Body.String())
 		assert.Equal(t, expectedBody, w.Body.String())
 	})
 
-	t.Run("should handle return 404 when user is not found", func(t *testing.T) {
+	t.Run("handle find should return 404 when user is not found", func(t *testing.T) {
 		w := httptest.NewRecorder()
 		userId := "2"
 		req, err := http.NewRequest("GET", "/api/v1/user?id="+userId, nil)
@@ -78,7 +77,7 @@ func TestUserHandlers(t *testing.T) {
 		assert.Equal(t, expectedResponseBody, w.Body.String())
 	})
 
-	t.Run("should handle return a list of users", func(t *testing.T) {
+	t.Run("handle list should return a list of users", func(t *testing.T) {
 		w := httptest.NewRecorder()
 		req, err := http.NewRequest("GET", "/api/v1/users", nil)
 		if err != nil {
@@ -92,7 +91,7 @@ func TestUserHandlers(t *testing.T) {
 		assert.Equal(t, expectedResponseBody, w.Body.String())
 	})
 
-	t.Run("should return created user", func(t *testing.T) {
+	t.Run("handle create should return created user", func(t *testing.T) {
 		w := httptest.NewRecorder()
 		payload := CreateUserRequest{
 			Name:     userTest.Name,
@@ -116,7 +115,7 @@ func TestUserHandlers(t *testing.T) {
 		assert.Equal(t, expectedResponseBody, w.Body.String())
 	})
 
-	t.Run("should return 400 when request boddy is empty", func(t *testing.T) {
+	t.Run("handle create should return 400 when request boddy is empty", func(t *testing.T) {
 		w := httptest.NewRecorder()
 		b, err := json.Marshal("{}")
 		if err != nil {
@@ -133,7 +132,7 @@ func TestUserHandlers(t *testing.T) {
 		assert.Equal(t, expectedResponseBody, w.Body.String())
 	})
 
-	t.Run("should return 400 when name is empty", func(t *testing.T) {
+	t.Run("handle create should return 400 when name is empty", func(t *testing.T) {
 		w := httptest.NewRecorder()
 		payload := CreateUserRequest{
 			Document: userTest.Document,
@@ -155,7 +154,7 @@ func TestUserHandlers(t *testing.T) {
 		assert.Equal(t, expectedResponseBody, w.Body.String())
 	})
 
-	t.Run("should return 400 when document is empty", func(t *testing.T) {
+	t.Run("handle create should return 400 when document is empty", func(t *testing.T) {
 		w := httptest.NewRecorder()
 		payload := CreateUserRequest{
 			Name:  userTest.Name,
@@ -177,7 +176,7 @@ func TestUserHandlers(t *testing.T) {
 		assert.Equal(t, expectedResponseBody, w.Body.String())
 	})
 
-	t.Run("should return 400 when email is empty", func(t *testing.T) {
+	t.Run("handle create should return 400 when email is empty", func(t *testing.T) {
 		w := httptest.NewRecorder()
 		payload := CreateUserRequest{
 			Name:     userTest.Name,
@@ -199,7 +198,7 @@ func TestUserHandlers(t *testing.T) {
 		assert.Equal(t, expectedResponseBody, w.Body.String())
 	})
 
-	t.Run("should return 400 when email is invalid", func(t *testing.T) {
+	t.Run("handle create should return 400 when email is invalid", func(t *testing.T) {
 		w := httptest.NewRecorder()
 		payload := CreateUserRequest{
 			Name:     userTest.Name,
@@ -222,7 +221,7 @@ func TestUserHandlers(t *testing.T) {
 		assert.Equal(t, expectedResponseBody, w.Body.String())
 	})
 
-	t.Run("should return updated user", func(t *testing.T) {
+	t.Run("handle update should return updated user", func(t *testing.T) {
 		w := httptest.NewRecorder()
 		payload := UpdateUserRequest{
 			Name:     "Updated Name",
@@ -251,7 +250,7 @@ func TestUserHandlers(t *testing.T) {
 		assert.Equal(t, expectedResponseBody, w.Body.String())
 	})
 
-	t.Run("should return 400 when user id is empty", func(t *testing.T) {
+	t.Run("should handle update return 400 when user id is empty", func(t *testing.T) {
 		w := httptest.NewRecorder()
 		payload := UpdateUserRequest{
 			Name:     "Updated Name",
@@ -278,7 +277,7 @@ func TestUserHandlers(t *testing.T) {
 		assert.Equal(t, expectedResponseBody, w.Body.String())
 	})
 
-	t.Run("should return 404 when user is not found", func(t *testing.T) {
+	t.Run("handle update should return 404 when user is not found", func(t *testing.T) {
 		w := httptest.NewRecorder()
 		payload := UpdateUserRequest{
 			Name:     "Updated Name",
@@ -306,7 +305,7 @@ func TestUserHandlers(t *testing.T) {
 		assert.Equal(t, expectedResponseBody, w.Body.String())
 	})
 
-	t.Run("should return 400 when payload is empty", func(t *testing.T) {
+	t.Run("handle update should return 400 when payload is empty", func(t *testing.T) {
 		w := httptest.NewRecorder()
 		payload := UpdateUserRequest{}
 
@@ -327,7 +326,7 @@ func TestUserHandlers(t *testing.T) {
 		assert.Equal(t, expectedResponseBody, w.Body.String())
 	})
 
-	t.Run("should return 400 when email is invalid", func(t *testing.T) {
+	t.Run("handle update should return 400 when email is invalid", func(t *testing.T) {
 		w := httptest.NewRecorder()
 		payload := UpdateUserRequest{
 			Email: "invalid email",
@@ -347,6 +346,51 @@ func TestUserHandlers(t *testing.T) {
 
 		expectedResponseBody := "{\"errorCode\":400,\"message\":\"param: email (type: string) is required\"}"
 		assert.Equal(t, http.StatusBadRequest, w.Code)
+		assert.Equal(t, expectedResponseBody, w.Body.String())
+	})
+
+	t.Run("handle delete should user by ID", func(t *testing.T) {
+		w := httptest.NewRecorder()
+		userId := strconv.Itoa(int(userTest.ID))
+		req, err := http.NewRequest("DELETE", "/api/v1/user?id="+userId, nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+		router.ServeHTTP(w, req)
+
+		expectedBody := "{" +
+			"\"data\":\"id: " + userId + "\"," +
+			"\"message\":\"operation from handler: delete-user successfull\"" +
+			"}"
+
+		assert.Equal(t, http.StatusOK, w.Code)
+		assert.Equal(t, expectedBody, w.Body.String())
+	})
+
+	t.Run("handle delete should return 400 when user id is empty", func(t *testing.T) {
+		w := httptest.NewRecorder()
+		req, err := http.NewRequest("DELETE", "/api/v1/user", nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+		router.ServeHTTP(w, req)
+
+		expectedResponseBody := "{\"errorCode\":400,\"message\":\"param: id (type: queryParameter) is required\"}"
+		assert.Equal(t, http.StatusBadRequest, w.Code)
+		assert.Equal(t, expectedResponseBody, w.Body.String())
+	})
+
+	t.Run("handle delete should return 404 when user is not found", func(t *testing.T) {
+		w := httptest.NewRecorder()
+		userId := "2"
+		req, err := http.NewRequest("DELETE", "/api/v1/user?id="+userId, nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+		router.ServeHTTP(w, req)
+
+		expectedResponseBody := "{\"errorCode\":404,\"message\":\"user with id: " + userId + " not found\"}"
+		assert.Equal(t, http.StatusNotFound, w.Code)
 		assert.Equal(t, expectedResponseBody, w.Body.String())
 	})
 }
