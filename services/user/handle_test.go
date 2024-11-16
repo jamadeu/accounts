@@ -6,6 +6,7 @@ import (
 	"errors"
 	"net/http"
 	"net/http/httptest"
+	"strconv"
 	"testing"
 	"time"
 
@@ -28,8 +29,10 @@ var userTest = schemas.User{
 	Email:    "test@test.com",
 }
 
-func getUserTestString() string {
-	b, err := json.Marshal(userTest)
+var updatedUserTest = userTest
+
+func jsonToString(s interface{}) string {
+	b, err := json.Marshal(s)
 	if err != nil {
 		panic(err)
 	}
@@ -44,14 +47,15 @@ func TestUserHandlers(t *testing.T) {
 
 	t.Run("should handle get user by ID", func(t *testing.T) {
 		w := httptest.NewRecorder()
-		req, err := http.NewRequest("GET", "/api/v1/user?id=1", nil)
+		userId := strconv.Itoa(int(userTest.ID))
+		req, err := http.NewRequest("GET", "/api/v1/user?id="+userId, nil)
 		if err != nil {
 			t.Fatal(err)
 		}
 		router.ServeHTTP(w, req)
 
 		expectedBody := "{" +
-			"\"data\":" + getUserTestString() + "," +
+			"\"data\":" + jsonToString(userTest) + "," +
 			"\"message\":\"operation from handler: find-user-by-id successfull\"" +
 			"}"
 
@@ -60,15 +64,16 @@ func TestUserHandlers(t *testing.T) {
 		assert.Equal(t, expectedBody, w.Body.String())
 	})
 
-	t.Run("should handle return 404 if user not found", func(t *testing.T) {
+	t.Run("should handle return 404 when user is not found", func(t *testing.T) {
 		w := httptest.NewRecorder()
-		req, err := http.NewRequest("GET", "/api/v1/user?id=2", nil)
+		userId := "2"
+		req, err := http.NewRequest("GET", "/api/v1/user?id="+userId, nil)
 		if err != nil {
 			t.Fatal(err)
 		}
 		router.ServeHTTP(w, req)
 
-		expectedResponseBody := "{\"errorCode\":404,\"message\":\"user with id: 2 not found\"}"
+		expectedResponseBody := "{\"errorCode\":404,\"message\":\"user with id: " + userId + " not found\"}"
 		assert.Equal(t, http.StatusNotFound, w.Code)
 		assert.Equal(t, expectedResponseBody, w.Body.String())
 	})
@@ -81,7 +86,7 @@ func TestUserHandlers(t *testing.T) {
 		}
 		router.ServeHTTP(w, req)
 
-		expectedResponseBody := "{\"data\":[" + getUserTestString() + "]," +
+		expectedResponseBody := "{\"data\":[" + jsonToString(userTest) + "]," +
 			"\"message\":\"operation from handler: list-users successfull\"}"
 		assert.Equal(t, http.StatusOK, w.Code)
 		assert.Equal(t, expectedResponseBody, w.Body.String())
@@ -105,7 +110,7 @@ func TestUserHandlers(t *testing.T) {
 		}
 		router.ServeHTTP(w, req)
 
-		expectedResponseBody := "{\"data\":" + getUserTestString() + "," +
+		expectedResponseBody := "{\"data\":" + jsonToString(userTest) + "," +
 			"\"message\":\"operation from handler: create-user successfull\"}"
 		assert.Equal(t, http.StatusOK, w.Code)
 		assert.Equal(t, expectedResponseBody, w.Body.String())
@@ -217,6 +222,133 @@ func TestUserHandlers(t *testing.T) {
 		assert.Equal(t, expectedResponseBody, w.Body.String())
 	})
 
+	t.Run("should return updated user", func(t *testing.T) {
+		w := httptest.NewRecorder()
+		payload := UpdateUserRequest{
+			Name:     "Updated Name",
+			Document: "10987654321",
+			Email:    "updated_email@test.com",
+		}
+		updatedUserTest.Name = payload.Name
+		updatedUserTest.Document = payload.Document
+		updatedUserTest.Email = payload.Email
+
+		b, err := json.Marshal(payload)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		userId := strconv.Itoa(int(userTest.ID))
+		req, err := http.NewRequest("PUT", "/api/v1/user?id="+userId, bytes.NewBuffer(b))
+		if err != nil {
+			t.Fatal(err)
+		}
+		router.ServeHTTP(w, req)
+
+		expectedResponseBody := "{\"data\":" + jsonToString(updatedUserTest) + "," +
+			"\"message\":\"operation from handler: update-user successfull\"}"
+		assert.Equal(t, http.StatusOK, w.Code)
+		assert.Equal(t, expectedResponseBody, w.Body.String())
+	})
+
+	t.Run("should return 400 when user id is empty", func(t *testing.T) {
+		w := httptest.NewRecorder()
+		payload := UpdateUserRequest{
+			Name:     "Updated Name",
+			Document: "10987654321",
+			Email:    "updated_email@test.com",
+		}
+		updatedUserTest.Name = payload.Name
+		updatedUserTest.Document = payload.Document
+		updatedUserTest.Email = payload.Email
+
+		b, err := json.Marshal(payload)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		req, err := http.NewRequest("PUT", "/api/v1/user", bytes.NewBuffer(b))
+		if err != nil {
+			t.Fatal(err)
+		}
+		router.ServeHTTP(w, req)
+
+		expectedResponseBody := "{\"errorCode\":400,\"message\":\"param: id (type: queryParameter) is required\"}"
+		assert.Equal(t, http.StatusBadRequest, w.Code)
+		assert.Equal(t, expectedResponseBody, w.Body.String())
+	})
+
+	t.Run("should return 404 when user is not found", func(t *testing.T) {
+		w := httptest.NewRecorder()
+		payload := UpdateUserRequest{
+			Name:     "Updated Name",
+			Document: "10987654321",
+			Email:    "updated_email@test.com",
+		}
+		updatedUserTest.Name = payload.Name
+		updatedUserTest.Document = payload.Document
+		updatedUserTest.Email = payload.Email
+
+		b, err := json.Marshal(payload)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		userId := "2"
+		req, err := http.NewRequest("PUT", "/api/v1/user?id="+userId, bytes.NewBuffer(b))
+		if err != nil {
+			t.Fatal(err)
+		}
+		router.ServeHTTP(w, req)
+
+		expectedResponseBody := "{\"errorCode\":404,\"message\":\"user with id: " + userId + " not found\"}"
+		assert.Equal(t, http.StatusNotFound, w.Code)
+		assert.Equal(t, expectedResponseBody, w.Body.String())
+	})
+
+	t.Run("should return 400 when payload is empty", func(t *testing.T) {
+		w := httptest.NewRecorder()
+		payload := UpdateUserRequest{}
+
+		b, err := json.Marshal(payload)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		userId := strconv.Itoa(int(userTest.ID))
+		req, err := http.NewRequest("PUT", "/api/v1/user?id="+userId, bytes.NewBuffer(b))
+		if err != nil {
+			t.Fatal(err)
+		}
+		router.ServeHTTP(w, req)
+
+		expectedResponseBody := "{\"errorCode\":400,\"message\":\"at least one valid field must be provided\"}"
+		assert.Equal(t, http.StatusBadRequest, w.Code)
+		assert.Equal(t, expectedResponseBody, w.Body.String())
+	})
+
+	t.Run("should return 400 when email is invalid", func(t *testing.T) {
+		w := httptest.NewRecorder()
+		payload := UpdateUserRequest{
+			Email: "invalid email",
+		}
+
+		b, err := json.Marshal(payload)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		userId := strconv.Itoa(int(userTest.ID))
+		req, err := http.NewRequest("PUT", "/api/v1/user?id="+userId, bytes.NewBuffer(b))
+		if err != nil {
+			t.Fatal(err)
+		}
+		router.ServeHTTP(w, req)
+
+		expectedResponseBody := "{\"errorCode\":400,\"message\":\"param: email (type: string) is required\"}"
+		assert.Equal(t, http.StatusBadRequest, w.Code)
+		assert.Equal(t, expectedResponseBody, w.Body.String())
+	})
 }
 
 type mockUserRepository struct{}
